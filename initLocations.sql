@@ -1,0 +1,35 @@
+INSERT INTO locations(location_id,location_name) VALUES ( 1, 'Side_Gate');
+INSERT INTO locations(location_id,location_name) VALUES ( 2, 'Garage');
+INSERT INTO locations(location_id,location_name) VALUES ( 3, 'Shed');
+INSERT INTO locations(location_id,location_name) VALUES ( 4, 'Back_Garden');
+INSERT INTO locations(location_id,location_name) VALUES ( 6, 'Downstairs_Hall');
+INSERT INTO locations(location_id,location_name) VALUES ( 7, 'Livingroom');
+INSERT INTO locations(location_id,location_name) VALUES ( 8, 'Study');
+INSERT INTO locations(location_id,location_name) VALUES ( 9, 'Joycies_Wee_Room');
+INSERT INTO locations(location_id,location_name) VALUES ( 10, 'Kitchen');
+INSERT INTO locations(location_id,location_name) VALUES ( 11, 'Hall_Cupboard');
+INSERT INTO locations(location_id,location_name) VALUES ( 12, 'Bathroom');
+INSERT INTO locations(location_id,location_name) VALUES ( 13, 'Upstairs_Hall');
+INSERT INTO locations(location_id,location_name) VALUES ( 14, 'Loft');
+INSERT INTO locations(location_id,location_name) VALUES ( 15, 'Main_Bedroom');
+INSERT INTO locations(location_id,location_name) VALUES ( 16, 'Spare_Bedroom');
+INSERT INTO locations(location_id,location_name) VALUES ( 17, 'Kitchen_Extension');
+
+INSERT INTO locations(location_id,location_name) VALUES ( 101, 'Front_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 102, 'Back_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 103, 'Livingroom_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 104, 'Kitchen_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 105, 'Bathroom_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 106, 'Spare_Bedroom_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 107, 'Main_Bedroom_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 108, 'Joycies_Wee_Room_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 109, 'Study_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 110, 'Garage_Door');
+INSERT INTO locations(location_id,location_name) VALUES ( 111, 'Garage_Back_Door');
+
+INSERT INTO locations(location_id,location_name) VALUES ( 301, 'Freezer');
+INSERT INTO locations(location_id,location_name) VALUES ( 302, 'Fridge');
+INSERT INTO locations(location_id,location_name) VALUES ( 303, 'WebPi');
+INSERT INTO locations(location_id,location_name) VALUES ( 304, 'HiFiPi');
+INSERT INTO locations(location_id,location_name) VALUES ( 305, 'rx433Pi');
+INSERT INTO locations(location_id,location_name) VALUES ( 306, 'frontDoorPi');

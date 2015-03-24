@@ -1,0 +1,2 @@
+##!/bin/bash
+g++ -g -I /projects/extlibs/Boost/dist test_locs.cpp locations.cpp eventLogger.cpp -lpthread -Wl,-Bstatic -L /projects/extlibs/Boost/stage/RHEL6-x86_64 -lboost_thread -lboost_system  -lboost_filesystem -Wl,-Bdynamic -o test_locs
