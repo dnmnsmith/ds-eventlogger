@@ -1,3 +1,4 @@
+INSERT INTO locations(location_id,location_name) VALUES ( 0, 'Unknown');
 INSERT INTO locations(location_id,location_name) VALUES ( 1, 'Side_Gate');
 INSERT INTO locations(location_id,location_name) VALUES ( 2, 'Garage');
 INSERT INTO locations(location_id,location_name) VALUES ( 3, 'Shed');

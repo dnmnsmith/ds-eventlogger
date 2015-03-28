@@ -11,7 +11,7 @@ DEPS = eventLogger.h locations.h
 OBJ = EventLoggerMain.o eventLogger.o
 
 
-%.o: %.c $(DEPS)
+%.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 eventLogger: $(OBJ)

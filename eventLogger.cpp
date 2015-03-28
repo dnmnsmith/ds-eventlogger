@@ -76,7 +76,7 @@ int eventLogger::logEventLocation( int locationId, const std::string& desc, cons
 {
   try
   {
-    std::cerr << "LocId=" << locationId << " " << " desc " << " " << value << std::endl;
+    std::cerr << "logEventLocation LocId=" << locationId << " " << " desc " << " " << value << std::endl;
 
     tntdb::Statement st = m_conn.prepare(
 			"INSERT INTO readings( timestamp,location_id,desc,value) VALUES( datetime(\'now\'),:v1,:v2,:v3)");
@@ -96,15 +96,37 @@ int eventLogger::logEventLocation( int locationId, const std::string& desc, cons
 //
 int eventLogger::getLocationId( const std::string &location_name )
 {
-	tntdb::Statement st = m_conn.prepare( "SELECT location_id FROM locations WHERE location_name=:v1" );
-	tntdb::Value value = st.set("v1", location_name ).selectValue();
-	return value.getInt();
+  int locationId = 0; // Default; unknown location
+
+  try
+  {
+	  tntdb::Statement st = m_conn.prepare( "SELECT location_id FROM locations WHERE location_name=:v1" );
+	  tntdb::Value value = st.set("v1", location_name ).selectValue();
+    locationId = value.getInt();
+  }
+  catch (const std::exception& e)
+  {
+  	std::cerr << "Exception in getLocationId for location " << location_name << " : " << e.what() << std::endl;
+  }
+   
+	return locationId;
 }
 
 int eventLogger::getSensorLocationId( const std::string &sensor_id )
 {
-	tntdb::Statement st = m_conn.prepare( "SELECT location_id FROM sensors WHERE sensor_id=:v1" );
-	tntdb::Value value = st.set("v1", sensor_id ).selectValue();
-	return value.getInt();
+  int locationId = 0; // Default; unknown location
+
+  try
+  {
+ 	  tntdb::Statement st = m_conn.prepare( "SELECT location_id FROM sensors WHERE sensor_id=:v1" );
+	  tntdb::Value value = st.set("v1", sensor_id ).selectValue();
+    locationId = value.getInt();
+   }
+  catch (const std::exception& e)
+  {
+  	std::cerr << "Exception in getSensorLocationId for sensor " << sensor_id << " : " << e.what() << std::endl;
+  }
+   
+	return locationId;
 }
 
