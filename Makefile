@@ -4,34 +4,42 @@ CFLAGS=-I$(IDIR) -Wall
 
 LDIR =../lib
 
-EXE=eventLogger
+LOGGEREXE=eventLogger
+LATESTEXE=latestEvents
+DAEMON=eventLoggerd
 
-INSTALLDIR=/usr/local/sbin
-
+LOGGERINSTALLDIR=/usr/local/sbin
+LATESTINSTALLDIR=/usr/local/bin
 
 LIBS= -lboost_thread -lboost_system  -lboost_filesystem -lcxxtools -lcxxtools-json -ltntdb -lrt -lm 
 
 DEPS = eventLogger.h Event.h
 
-OBJ = EventLoggerMain.o eventLogger.o Event.o
-
+LOGGEROBJ = EventLoggerMain.o eventLogger.o Event.o
+LATESTOBJ = latestEvents.o Event.o
 
 %.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(EXE): $(OBJ)
+$(LOGGEREXE): $(LOGGEROBJ)
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+$(LATESTEXE): $(LATESTOBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean all install
 
 clean:
-	rm -f $(OBJ) 
+	rm -f $(LOGGEROBJ) $(LATESTOBJ)
 
 clobber:
-	rm -f $(OBJ) $(EXE)
+	rm -f $(LOGGEROBJ) $(LOGGEREXE) $(LATESTEXE)
 
-all: $(EXE)
+all: $(LOGGEREXE) $(LATESTEXE)
 
 install:
-	cp -f $(EXE) $(INSTALLDIR)
-
+	cp -f $(LOGGEREXE) $(LOGGERINSTALLDIR)
+	cp -f $(LATESTEXE) $(LATESTINSTALLDIR)
+	cp -f $(DAEMON) /etc/init.d
+	@echo "To start at bootup run:"
+	@echo "sudo update-rc.d eventLoggerd defaults"
