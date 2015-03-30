@@ -13,18 +13,6 @@
 #include <tntdb/value.h>
 
 
-// Known locations
-const std::string LOCATIONS_FILE = "locations.cfg" ;
-
-// Map of devices to location names.
-const std::string DEVICE_MAP_FILE = "locMapFile.cfg";
-
-const std::string EVENTS_FILE_NAME = "event_log.txt";
-
-const char *TIMESTAMP_FORMAT = "%F:%T";
-
-const std::string FIELD_SEPERATOR = "\t";
-
 eventLogger::eventLogger( tntdb::Connection & conn ) : m_conn( conn )
 {
 
@@ -38,14 +26,13 @@ eventLogger::~eventLogger()
 
 
 // Log an event at a location
-int eventLogger::logEvent( const std::string &location, const std::string& desc, const std::string& value )
+int eventLogger::logEventLocation( const std::string &location, const std::string& desc, const std::string& value )
 {
   try
   {
-	// Get the location id
-	int locationId = getLocationId( location );
+	Event event( location, desc, value );
 
-	return logEventLocation( locationId, desc, value );
+	return logEvent( event );
   }
   catch (const std::exception& e)
   {
@@ -60,9 +47,11 @@ int eventLogger::logEventSensor( const std::string& sensorId, const std::string&
   try
   {
 	// Get the location id
-	int locationId = getSensorLocationId( sensorId );
+	std::string locationName = getSensorLocationName( sensorId );
 
-	return logEventLocation( locationId, desc, value );
+	Event event( locationName, desc, value );
+
+	return logEvent( event );
   }
   catch (const std::exception& e)
   {
@@ -71,24 +60,6 @@ int eventLogger::logEventSensor( const std::string& sensorId, const std::string&
   }
 }
 
-
-int eventLogger::logEventLocation( int locationId, const std::string& desc, const std::string& value )
-{
-  try
-  {
-    std::cerr << "logEventLocation LocId=" << locationId << " " << " desc " << " " << value << std::endl;
-
-    tntdb::Statement st = m_conn.prepare(
-			"INSERT INTO readings( timestamp,location_id,desc,value) VALUES( datetime(\'now\'),:v1,:v2,:v3)");
-	st.setInt( "v1", locationId ).setString("v2",desc).setString("v3",value).execute();
-  }
-  catch (const std::exception& e)
-  {
-	std::cerr << "Exception in logEventLocation : " << e.what() << std::endl;
-	return 1;
-  }
-  return 0;
-}
 
 //-----------------------------------------------------------------------------------
 // Return 0 on error, or the corresponding location id.
@@ -129,4 +100,67 @@ int eventLogger::getSensorLocationId( const std::string &sensor_id )
    
 	return locationId;
 }
+
+std::string eventLogger::getSensorLocationName( const std::string &sensor_id )
+{
+  std::string locationName= "Unknown"; // Default; unknown location
+
+  try
+  {
+ 	  tntdb::Statement st = m_conn.prepare( "SELECT location_name FROM sensors JOIN locations using (location_id)  WHERE sensor_id=:v1" );
+	  tntdb::Value value = st.set("v1", sensor_id ).selectValue();
+      locationName = value.getString();
+   }
+  catch (const std::exception& e)
+  {
+  	std::cerr << "Exception in getSensorLocationName for sensor " << sensor_id << " : " << e.what() << std::endl;
+  }
+
+  return locationName;
+}
+
+std::vector<Event> eventLogger::getLatestEvents()
+{
+	std::vector<Event> latestEvents;
+
+	for (std::map<std::string, Event>::iterator it=m_latestEventMap.begin(); it != m_latestEventMap.end(); it++)
+	{
+		latestEvents.push_back( it->second );
+	}
+
+	return latestEvents;
+}
+
+
+int eventLogger::logEvent( const Event &event )
+{
+	std::map<std::string, Event>::iterator it = m_latestEventMap.find(event.getKey() );
+
+	if (it != m_latestEventMap.end())
+	{
+		it->second.assign(event);	// Over-write
+	}
+	else
+	{
+		m_latestEventMap.insert( std::pair<std::string, Event>(event.getKey(),event) );
+	}
+
+	try
+	{
+		int locationId = getLocationId( event.getLocation() );
+
+		std::cerr << "logEvent " << event << std::endl;
+
+		tntdb::Statement st = m_conn.prepare(
+		"INSERT INTO readings( timestamp,location_id,desc,value) VALUES( :v1,:v2,:v3,:v4)");
+		st.setDatetime( "v1", event.getDateTime() ).setInt( "v2", locationId ).setString("v3",event.getDesc()).setString("v4",event.getValue()).execute();
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Exception in logEvent : " << e.what() << std::endl;
+		return 1;
+	}
+	return 0;
+}
+
 

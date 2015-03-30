@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 
     std::cerr << "Kitchen location id = " << logger.getLocationId( "Kitchen" ) << std::endl;
 
-    logger.logEvent( "Kitchen", "Temperature", "22.0" );
+    logger.logEventLocation( "Kitchen", "Temperature", "22.0" );
 
     // create an event loop
     cxxtools::EventLoop loop;
@@ -81,9 +81,9 @@ int main(int argc, char* argv[])
     // and register the functions in the server
     jsonServer.registerFunction("echo", echo);
 
-    jsonServer.registerMethod< int, eventLogger, const std::string &, const std::string &, const std::string &>("logEvent", logger, &eventLogger::logEvent);
+    jsonServer.registerMethod< int, eventLogger, const std::string &, const std::string &, const std::string &>("logEvenLocation", logger, &eventLogger::logEventLocation);
     jsonServer.registerMethod< int, eventLogger, const std::string &, const std::string &, const std::string &>("logEventSensor", logger, &eventLogger::logEventSensor);
-    jsonServer.registerMethod< int, eventLogger, int, const std::string &, const std::string &>("logEventLocation", logger, &eventLogger::logEventLocation);
+    jsonServer.registerMethod< std::vector<Event>, eventLogger>("getLatestEvents", logger, &eventLogger::getLatestEvents);
 
     ////////////////////////////////////////////////////////////////////////
     // Run
