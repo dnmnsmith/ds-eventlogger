@@ -89,7 +89,7 @@ std::ostream& operator<< (std::ostream& stream, const Event & event )
 
 	gmtime_r(&event.m_time, &gmt);
 	char buf[ 160 ];
-	strftime (buf, sizeof(buf), "%F %T.000", &gmt );
+	strftime (buf, sizeof(buf), "%FT%T.000Z", &gmt );
 	stream << buf << " " << event.m_location << ":" << event.m_desc << "=" << event.m_value;
 	return stream;
 }

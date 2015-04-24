@@ -13,7 +13,10 @@
 #include <tntdb/value.h>
 
 
-eventLogger::eventLogger( tntdb::Connection & conn ) : m_conn( conn )
+eventLogger::eventLogger( tntdb::Connection & conn ) :
+	m_latestEventMap(),
+	m_unknownSensors(),
+	m_conn( conn )
 {
 
 
@@ -49,9 +52,20 @@ int eventLogger::logEventSensor( const std::string& sensorId, const std::string&
 	// Get the location id
 	std::string locationName = getSensorLocationName( sensorId );
 
-	Event event( locationName, desc, value );
+	if (locationName.compare("Unknown") == 0)
+	{
+		Event event( sensorId, desc, value );
+		logUnknownSensorEvent( event );
+		return 1;
+	}
+	else
+	{
+		// Remove from unknown sensors
+		knownSensorEvent( sensorId );
+		Event event( locationName, desc, value );
+		return logEvent( event );
+	}
 
-	return logEvent( event );
   }
   catch (const std::exception& e)
   {
@@ -124,9 +138,7 @@ std::vector<Event> eventLogger::getLatestEvents()
 	std::vector<Event> latestEvents;
 
 	for (std::map<std::string, Event>::iterator it=m_latestEventMap.begin(); it != m_latestEventMap.end(); it++)
-	{
 		latestEvents.push_back( it->second );
-	}
 
 	return latestEvents;
 }
@@ -163,4 +175,33 @@ int eventLogger::logEvent( const Event &event )
 	return 0;
 }
 
+// Unknown sensor with location as the sensor id.
+void eventLogger::logUnknownSensorEvent(const Event &event )
+{
+	std::map<std::string, Event>::iterator it = m_unknownSensors.find(event.getLocation() );
+	if (it != m_unknownSensors.end())
+	{
+		it->second.assign(event);	// Over-write
+	}
+	else
+	{
+		m_unknownSensors.insert( std::pair<std::string, Event>(event.getLocation(),event) );
+	}
+}
 
+std::vector<Event> eventLogger::getUnknownSensorEvents()
+{
+	std::vector<Event> unknownEvents;
+	for (std::map<std::string, Event>::iterator it=m_unknownSensors.begin(); it != m_unknownSensors.end(); it++)
+		unknownEvents.push_back( it->second );
+	return unknownEvents;
+}
+
+
+// Remove known sensor from list of unknown if present in unknown list.
+void eventLogger::knownSensorEvent( const std::string &sensorId )
+{
+	std::map<std::string, Event>::iterator it = m_unknownSensors.find(sensorId );
+	if (it != m_unknownSensors.end())
+		m_unknownSensors.erase( it );
+}

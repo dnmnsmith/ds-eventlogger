@@ -5,3 +5,4 @@ INSERT INTO sensors(sensor_id,location_id) VALUES ( '497', (SELECT location_id F
 INSERT INTO sensors(sensor_id,location_id) VALUES ( '43A', (SELECT location_id FROM locations WHERE location_name = 'Study'));
 INSERT INTO sensors(sensor_id,location_id) VALUES ( '485', (SELECT location_id FROM locations WHERE location_name = 'Freezer'));
 INSERT INTO sensors(sensor_id,location_id) VALUES ( '479', (SELECT location_id FROM locations WHERE location_name = 'Side_Gate'));
+INSERT INTO sensors(sensor_id,location_id) VALUES ( '49D', (SELECT location_id FROM locations WHERE location_name = 'Livingroom'));

@@ -16,6 +16,7 @@ INSERT INTO locations(location_id,location_name) VALUES ( 15, 'Main_Bedroom');
 INSERT INTO locations(location_id,location_name) VALUES ( 16, 'Spare_Bedroom');
 INSERT INTO locations(location_id,location_name) VALUES ( 17, 'Kitchen_Extension');
 
+INSERT INTO locations(location_id,location_name) VALUES ( 100, 'Outside');
 INSERT INTO locations(location_id,location_name) VALUES ( 101, 'Front_Door');
 INSERT INTO locations(location_id,location_name) VALUES ( 102, 'Back_Door');
 INSERT INTO locations(location_id,location_name) VALUES ( 103, 'Livingroom_Door');

@@ -81,9 +81,10 @@ int main(int argc, char* argv[])
     // and register the functions in the server
     jsonServer.registerFunction("echo", echo);
 
-    jsonServer.registerMethod< int, eventLogger, const std::string &, const std::string &, const std::string &>("logEvenLocation", logger, &eventLogger::logEventLocation);
+    jsonServer.registerMethod< int, eventLogger, const std::string &, const std::string &, const std::string &>("logEventLocation", logger, &eventLogger::logEventLocation);
     jsonServer.registerMethod< int, eventLogger, const std::string &, const std::string &, const std::string &>("logEventSensor", logger, &eventLogger::logEventSensor);
     jsonServer.registerMethod< std::vector<Event>, eventLogger>("getLatestEvents", logger, &eventLogger::getLatestEvents);
+    jsonServer.registerMethod< std::vector<Event>, eventLogger>("getUnknownSensorEvents", logger, &eventLogger::getUnknownSensorEvents);
 
     ////////////////////////////////////////////////////////////////////////
     // Run
