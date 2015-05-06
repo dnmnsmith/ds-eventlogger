@@ -67,8 +67,6 @@ int main(int argc, char* argv[])
 
     std::cerr << "Kitchen location id = " << logger.getLocationId( "Kitchen" ) << std::endl;
 
-    logger.logEventLocation( "Kitchen", "Temperature", "22.0" );
-
     // create an event loop
     cxxtools::EventLoop loop;
 
@@ -85,6 +83,11 @@ int main(int argc, char* argv[])
     jsonServer.registerMethod< int, eventLogger, const std::string &, const std::string &, const std::string &>("logEventSensor", logger, &eventLogger::logEventSensor);
     jsonServer.registerMethod< std::vector<Event>, eventLogger>("getLatestEvents", logger, &eventLogger::getLatestEvents);
     jsonServer.registerMethod< std::vector<Event>, eventLogger>("getUnknownSensorEvents", logger, &eventLogger::getUnknownSensorEvents);
+    jsonServer.registerMethod< std::vector<Event>, eventLogger>("getMinEvents", logger, &eventLogger::getMinEvents);
+    jsonServer.registerMethod< std::vector<Event>, eventLogger>("getMaxEvents", logger, &eventLogger::getMaxEvents);
+    jsonServer.registerMethod< std::vector<Event>, eventLogger, const std::string & >("getLocationEvents", logger, &eventLogger::getLocationEvents);
+    jsonServer.registerMethod< std::vector<std::string>, eventLogger>("getLocations", logger, &eventLogger::getLocations);
+    jsonServer.registerMethod< std::map< std::string, std::vector<Event> >, eventLogger>("getEventSummary", logger, &eventLogger::getEventSummary);
 
     ////////////////////////////////////////////////////////////////////////
     // Run

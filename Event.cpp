@@ -25,6 +25,15 @@ Event::Event( const time_t &rTime, const std::string &location, const std::strin
 {
 }
 
+Event::Event( const tntdb::Datetime &rTime, const std::string &location, const std::string &desc, const std::string &value ) :
+  m_location( location ), m_desc( desc ), m_value( value )
+{
+ std::string sTime = rTime.getIso();
+ struct tm t;
+ strptime(sTime.c_str(), "%Y-%m-%d %H:%M", &t);
+ m_time = mktime(&t);
+}
+
 Event & Event::operator= (const Event & o)
 {
    if (this != &o) // protect against invalid self-assignment
@@ -36,6 +45,12 @@ Event & Event::operator= (const Event & o)
    }
    // by convention, always return *this
    return *this;
+}
+
+bool Event::differ( const Event &e ) const
+{
+	return ( (m_location.compare(e.m_location) != 0) || (m_desc.compare(e.m_desc) != 0) || (m_value.compare( e.m_value ) != 0) );
+
 }
 
 void Event::assign( Event e )
@@ -67,12 +82,17 @@ std::string Event::getLocation() const { return m_location; }
 std::string Event::getDesc() const { return m_desc; }
 std::string Event::getValue() const { return m_value; }
 
+std::string Event::makeKey( const std::string &location, const std::string &desc )
+{
+	std::string key = location;
+	key.append(":");
+	key.append(desc);
+	return key;
+}
+
 std::string Event::getKey() const
 {
-	std::string key = m_location;
-	key.append(":");
-	key.append(m_desc);
-	return key;
+	return makeKey( m_location, m_desc );
 }
 
 tntdb::Datetime Event::getDateTime() const
@@ -126,4 +146,25 @@ void swap(Event& first, Event& second)
 	std::swap( first.m_desc,second.m_desc );
 	std::swap( first.m_value,second.m_value );
 }
+
+
+double Event::getValueDouble() const
+{
+	try
+	{
+		return boost::lexical_cast<double>( getValue() );
+	}
+    catch(const boost::bad_lexical_cast &ex)
+    {
+    	std::cerr << "Failed to lex " << getValue() << std::endl;
+		return 0.0;
+	}
+}
+
+bool operator ==(const Event &a, const Event &b) { return a.getValueDouble() == b.getValueDouble(); }
+bool operator !=(const Event &a, const Event &b) { return a.getValueDouble() != b.getValueDouble(); }
+bool operator <(const Event &a, const Event &b) { return a.getValueDouble() < b.getValueDouble(); }
+bool operator >(const Event &a, const Event &b) { return a.getValueDouble() > b.getValueDouble(); }
+bool operator <=(const Event &a, const Event &b) { return a.getValueDouble() <= b.getValueDouble(); }
+bool operator >=(const Event &a, const Event &b) { return a.getValueDouble() >= b.getValueDouble(); }
 

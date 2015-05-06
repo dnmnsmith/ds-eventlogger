@@ -5,21 +5,18 @@ CFLAGS=-I$(IDIR) -Wall
 LDIR =../lib
 
 LOGGEREXE=eventLogger
-LATESTEXE=latestEvents
-UNKNOWNEXE=unknownEvents
+EVENTSEXE=events
 DAEMON=eventLoggerd
 
 LOGGERINSTALLDIR=/usr/local/sbin
-LATESTINSTALLDIR=/usr/local/bin
-UNKNOWNINSTALLDIR=/usr/local/bin
+EVENTSINSTALLDIR=/usr/local/bin
 
 LIBS= -lboost_thread -lboost_system  -lboost_filesystem -lcxxtools -lcxxtools-json -ltntdb -lrt -lm 
 
 DEPS = eventLogger.h Event.h
 
 LOGGEROBJ = EventLoggerMain.o eventLogger.o Event.o
-LATESTOBJ = latestEvents.o Event.o
-UNKNOWNOBJ = unknownEvents.o Event.o
+EVENTSOBJ = events.o Event.o
 
 %.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -27,17 +24,14 @@ UNKNOWNOBJ = unknownEvents.o Event.o
 $(LOGGEREXE): $(LOGGEROBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-$(LATESTEXE): $(LATESTOBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-$(UNKNOWNEXE): $(UNKNOWNOBJ)
+$(EVENTSEXE): $(EVENTSOBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 
 .PHONY: clean all install
 
 clean:
-	rm -f $(LOGGEROBJ) $(LATESTOBJ) $(UNKNOWNOBJ) 
+	rm -f $(LOGGEROBJ) $(EVENTSOBJ) $(UNKNOWNOBJ) 
 
 clobber:
 	rm -f $(LOGGEROBJ) $(LOGGEREXE) $(LATESTEXE) $(UNKNOWNEXE)
@@ -46,8 +40,12 @@ all: $(LOGGEREXE) $(LATESTEXE) $(UNKNOWNEXE)
 
 install:
 	cp -f $(LOGGEREXE) $(LOGGERINSTALLDIR)
-	cp -f $(LATESTEXE) $(LATESTINSTALLDIR)
-	cp -f $(UNKNOWNEXE) $(UNKNOWNINSTALLDIR)
+	cp -f $(EVENTSEXE) $(EVENTSINSTALLDIR)
+	ln -s -f $(EVENTSINSTALLDIR)/$(EVENTSEXE) $(EVENTSINSTALLDIR)/latestEvents
+	ln -s -f $(EVENTSINSTALLDIR)/$(EVENTSEXE) $(EVENTSINSTALLDIR)/minEvents
+	ln -s -f $(EVENTSINSTALLDIR)/$(EVENTSEXE) $(EVENTSINSTALLDIR)/maxEvents
+	ln -s -f $(EVENTSINSTALLDIR)/$(EVENTSEXE) $(EVENTSINSTALLDIR)/unknownEvents
 	cp -f $(DAEMON) /etc/init.d
 	@echo "To start at bootup run:"
 	@echo "sudo update-rc.d eventLoggerd defaults"
+	@echo "sudo service eventLoggerd start"
