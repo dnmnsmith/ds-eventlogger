@@ -1,3 +1,9 @@
+CREATE TABLE loctype ( loctype_id INTEGER PRIMARY KEY NOT NULL, loctype_name TEXT NOT NULL );
+INSERT INTO loctype( loctype_id, loctype_name) VALUES (1,'Outside');
+INSERT INTO loctype( loctype_id, loctype_name) VALUES (2,'Inside');
+INSERT INTO loctype( loctype_id, loctype_name) VALUES (3,'Computers');
+INSERT INTO loctype( loctype_id, loctype_name) VALUES (4,'Freezer');
+
 INSERT INTO locations(location_id,location_name) VALUES ( 0, 'Unknown');
 INSERT INTO locations(location_id,location_name) VALUES ( 1, 'Side_Gate');
 INSERT INTO locations(location_id,location_name) VALUES ( 2, 'Garage');

@@ -23,6 +23,7 @@ class Event
 		void init( const time_t &rTime, const std::string &location, const std::string &desc, const std::string &value );
 
 		time_t getTime() const;
+    void setTime( const time_t &time );
 		tntdb::Datetime getDateTime() const;
 
 		std::string getLocation() const;
@@ -30,6 +31,10 @@ class Event
 		std::string getValue() const;
 		double getValueDouble() const;
 
+    std::string getUnits() const;
+
+    static std::string getUnits( const std::string &desc );    
+    
 		std::string getKey() const;
 		static std::string makeKey( const std::string &location, const std::string &desc );
 		
@@ -55,6 +60,8 @@ class Event
 		std::string m_location;
 		std::string m_desc;
 		std::string m_value;
+   
+    static std::map< std::string, std::string > descUnitMap;
 };
 
 #endif

@@ -15,7 +15,6 @@
 #include <boost/filesystem.hpp>
 
 
-
 void printEvents( const std::vector<Event> &events, const std::string &prefix = std::string() )
 {
    BOOST_FOREACH( Event e, events )
@@ -26,6 +25,20 @@ void printEvents( const std::vector<Event> &events, const std::string &prefix = 
     }
  		std::cout << e << std::endl;
     }
+}
+
+void addNowEvent( std::vector<Event> &events )
+{
+  // 
+  if (events.size() != 0)
+  {
+    time_t timeNow;
+    time( &timeNow );
+        
+    Event nowValue = events.back();
+    nowValue.setTime( timeNow );
+    events.push_back( nowValue );
+  }
 }
 
 void usage( const std::string &progName )
@@ -122,18 +135,90 @@ int main( int argc, char **argv )
     if (locationEvents.isSet())
     {
     	std::vector<Event> events = getLocationEvents( locationEvents );
+
+      addNowEvent( events );
+
       printEvents( events );
     }   
     
     if (bDoSummary.isSet())
     {
+       //    evClass (min/max/...)
        std::map< std::string, std::vector<Event> > typeMap = getEventSummary( );
+       std::set< std::string > locs;
+       std::set< std::string > eventClass;
 
        std::map< std::string, std::vector<Event> >::iterator typeIt = typeMap.begin();
        for (; typeIt != typeMap.end(); ++typeIt)
        {
-         printEvents( typeIt->second, typeIt->first );
+         //printEvents( typeIt->second, typeIt->first );
+         if (eventClass.count( typeIt->first ) == 0 )
+            eventClass.insert( typeIt->first );
+         BOOST_FOREACH( Event e, typeIt->second )
+         {
+            if (locs.count( e.getKey() ) == 0)
+               locs.insert( e.getKey() );
+         }
        }
+       // Now have list of locations and list of 
+       //       Location Key             evClass       Value
+       std::map< std::string, std::map< std::string, std::string > > locationEventMap;
+       BOOST_FOREACH( std::string loc, locs )
+       {
+        std::map< std::string, std::string > locationEvents;
+        BOOST_FOREACH( std::string evType, eventClass )
+        {
+           // Add blank value for each class at the location
+           locationEvents.insert( std::pair< std::string, std::string >( evType, "" ) );  
+        }
+        // Add to location map.
+        locationEventMap.insert( std::pair< std::string, std::map< std::string, std::string > >( loc, locationEvents ) );
+       }
+       
+       for (typeIt = typeMap.begin(); typeIt != typeMap.end(); ++typeIt)
+       {
+         const std::string &evType = typeIt->first;  // "min/max/act/..."
+         BOOST_FOREACH( Event e, typeIt->second )
+         {
+            std::string loc = e.getKey();
+
+            if ( locationEventMap.find( loc ) == locationEventMap.end())
+               throw std::runtime_error("Location lookup failure. Can't Happen");
+            
+            std::map< std::string, std::string > &locationSummary = locationEventMap.find( loc )->second;
+            
+            if ( locationSummary.find( evType ) == locationSummary.end() )
+               throw std::runtime_error("Location/Event type lookup failure. Can't Happen");
+               
+            locationSummary.find( evType )->second.assign( e.getValue() );
+            //locationSummary.find( evType )->second.append( " " );
+            locationSummary.find( evType )->second.append( e.getUnits() );
+         }
+       }
+       
+       std::map< std::string, std::map< std::string, std::string > >::iterator locMapIt = locationEventMap.begin();
+       
+       for( ; locMapIt != locationEventMap.end(); ++locMapIt)
+       {
+         const std::string &loc = locMapIt->first;
+         std::map< std::string, std::string > & locSummary = locMapIt->second;
+         
+//         std::cout << loc.substr( 0, loc.find_first_of(":") );
+         
+         std::cout << loc << ":";
+         
+         std::map< std::string, std::string >::iterator locSummaryIt = locSummary.begin();
+         for (; locSummaryIt != locSummary.end(); ++locSummaryIt)
+         {
+            const std::string &value = locSummaryIt->first;
+            if (locSummaryIt != locSummary.begin())
+               std::cout << ","; 
+            std::cout << value << "=" << locSummaryIt->second;
+         }
+         std::cout << std::endl;
+       } 
+       
+       
     }
     
   }

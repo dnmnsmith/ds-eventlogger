@@ -4,6 +4,8 @@
 
 using std::swap;
 
+std::map< std::string, std::string > Event::descUnitMap;
+
 Event::Event() : m_location(), m_desc(), m_value()
 {
 	time( &m_time );
@@ -78,6 +80,8 @@ void Event::init( const time_t &rTime, const std::string &location, const std::s
 
 
 time_t Event::getTime() const { return m_time; }
+void Event::setTime( const time_t &time ) { m_time = time; }
+
 std::string Event::getLocation() const { return m_location; }
 std::string Event::getDesc() const { return m_desc; }
 std::string Event::getValue() const { return m_value; }
@@ -102,6 +106,28 @@ tntdb::Datetime Event::getDateTime() const
 	tntdb::Datetime dt( 1900+gmt.tm_year, gmt.tm_mon + 1,gmt.tm_mday,gmt.tm_hour,gmt.tm_min,gmt.tm_sec );
 	return dt;
 }
+
+
+std::string Event::getUnits() const
+{
+ return getUnits( getDesc() );
+}
+
+std::string Event::getUnits( const std::string &desc )
+{
+ if (descUnitMap.empty())
+ {
+    descUnitMap.insert( std::pair< std::string, std::string >( "Pressure", "&nbsp;mb" ) );
+    descUnitMap.insert( std::pair< std::string, std::string >( "Temperature", "&deg;C" ) );
+    descUnitMap.insert( std::pair< std::string, std::string >( "Humidity", "&percnt;" ) );
+ }
+ 
+ std::map< std::string, std::string >::iterator it = descUnitMap.find( desc );
+ if (it == descUnitMap.end())
+    return std::string("");
+ else
+    return it->second;
+}    
 
 std::ostream& operator<< (std::ostream& stream, const Event & event )
 {
